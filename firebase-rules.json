@@ -1,0 +1,189 @@
+{
+  "rules": {
+    "ranges": {
+      "$room": {
+        ".read": "auth != null",
+        "players": {
+          "$uid": {
+            ".write": "(auth != null && auth.uid === $uid) && (!newData.exists() || !$room.matches(/^MAIN-.*$/) || (root.child('matchmaking/main/round/phase').val() === 'playing' && root.child('matchmaking/main/round/startsAt').val() <= now && root.child('matchmaking/main/round/endsAt').val() > now && $room === 'MAIN-' + root.child('matchmaking/main/round/id').val() && root.child('matchmaking/main/round/roster').child(auth.uid).val() === true))",
+            ".validate": "newData.hasChildren(['x','y','z','yaw','pitch','name','t','shot','reload','weapon','protocol','stance','kills','deaths'])",
+            "x": {
+              ".validate": "newData.isNumber() && newData.val() >= -64 && newData.val() <= 64"
+            },
+            "y": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 5"
+            },
+            "z": {
+              ".validate": "newData.isNumber() && newData.val() >= -64 && newData.val() <= 64"
+            },
+            "yaw": {
+              ".validate": "newData.isNumber() && newData.val() >= -1000000 && newData.val() <= 1000000"
+            },
+            "pitch": {
+              ".validate": "newData.isNumber() && newData.val() >= -1.6 && newData.val() <= 1.6"
+            },
+            "name": {
+              ".validate": "newData.isString() && newData.val().length <= 18"
+            },
+            "t": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 9999999999999"
+            },
+            "shot": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999999999 && newData.val() % 1 === 0"
+            },
+            "reload": {
+              ".validate": "newData.isBoolean()"
+            },
+            "weapon": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 46 && newData.val() % 1 === 0"
+            },
+            "protocol": {
+              ".validate": "newData.val() === 2"
+            },
+            "stance": {
+              ".validate": "newData.val() === 'stand' || newData.val() === 'crouch' || newData.val() === 'prone' || newData.val() === 'slide'"
+            },
+            "kills": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999999 && newData.val() % 1 === 0"
+            },
+            "deaths": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999999 && newData.val() % 1 === 0"
+            },
+            "$other": {
+              ".validate": false
+            },
+            "movement": {
+              ".validate": "newData.val() === 'walk' || newData.val() === 'sprint' || newData.val() === 'tac'"
+            }
+          }
+        },
+        "combat": {
+          "$uid": {
+            ".write": "(auth != null && ((auth.uid === $uid) || (auth.uid !== $uid && data.exists() && newData.exists() && data.child('hp').val() > 0 && data.child('spawnAt').val() + 1500 <= now && root.child('ranges').child($room).child('players').child(auth.uid).exists() && root.child('ranges').child($room).child('players').child($uid).exists() && root.child('ranges').child($room).child('combat').child(auth.uid).child('hp').val() > 0))) && (!newData.exists() || !$room.matches(/^MAIN-.*$/) || (root.child('matchmaking/main/round/phase').val() === 'playing' && root.child('matchmaking/main/round/startsAt').val() <= now && root.child('matchmaking/main/round/endsAt').val() > now && $room === 'MAIN-' + root.child('matchmaking/main/round/id').val() && root.child('matchmaking/main/round/roster').child(auth.uid).val() === true))",
+            ".validate": "newData.hasChildren(['hp','life','spawnAt','deadUntil','deaths','lastAttacker','lastDamageAt']) && (auth.uid === $uid ? (newData.child('hp').val() === 100 && newData.child('deadUntil').val() === 0 && newData.child('lastDamageAt').val() === 0 && newData.child('lastAttacker').val() === '' && newData.child('spawnAt').val() >= now - 3000 && newData.child('spawnAt').val() <= now + 1000 && (!data.exists() || (data.child('hp').val() === 0 && data.child('deadUntil').val() <= now && newData.child('life').val() === data.child('life').val() + 1 && newData.child('deaths').val() === data.child('deaths').val()))) : (newData.child('life').val() === data.child('life').val() && newData.child('spawnAt').val() === data.child('spawnAt').val() && newData.child('hp').val() === ((root.child('ranges').child($room).child('players').child(auth.uid).child('weapon').val() === 13 || root.child('ranges').child($room).child('players').child(auth.uid).child('weapon').val() === 14 || root.child('ranges').child($room).child('players').child(auth.uid).child('weapon').val() === 24 || root.child('ranges').child($room).child('players').child(auth.uid).child('weapon').val() === 45) ? 0 : (data.child('hp').val() > 25 ? data.child('hp').val() - 25 : 0)) && newData.child('lastAttacker').val() === auth.uid && newData.child('lastDamageAt').val() >= now - 3000 && newData.child('lastDamageAt').val() <= now + 1000 && newData.child('receipts').child(auth.uid).val() > (data.child('receipts').child(auth.uid).exists() ? data.child('receipts').child(auth.uid).val() : -1) && (newData.child('hp').val() === 0 ? (newData.child('deadUntil').val() >= now + 2000 && newData.child('deadUntil').val() <= now + 4000 && newData.child('deaths').val() === data.child('deaths').val() + 1) : (newData.child('deadUntil').val() === 0 && newData.child('deaths').val() === data.child('deaths').val()))))",
+            "hp": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100 && newData.val() % 1 === 0"
+            },
+            "life": {
+              ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 9999999999999 && newData.val() % 1 === 0"
+            },
+            "spawnAt": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 9999999999999"
+            },
+            "deadUntil": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 9999999999999"
+            },
+            "deaths": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999999 && newData.val() % 1 === 0"
+            },
+            "lastAttacker": {
+              ".validate": "newData.isString() && newData.val().length <= 128"
+            },
+            "lastDamageAt": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 9999999999999"
+            },
+            "receipts": {
+              "$attacker": {
+                ".validate": "newData.isNumber() && newData.val() % 1 === 0 && newData.val() >= 0 && (auth.uid === $uid || (auth.uid === $attacker ? (!data.exists() || newData.val() > data.val()) : newData.val() === data.val()))"
+              }
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        "targets": {
+          "$target": {
+            ".write": "(auth != null && $target.matches(/^t[0-9]+$/)) && (!newData.exists() || !$room.matches(/^MAIN-.*$/) || (root.child('matchmaking/main/round/phase').val() === 'playing' && root.child('matchmaking/main/round/startsAt').val() <= now && root.child('matchmaking/main/round/endsAt').val() > now && $room === 'MAIN-' + root.child('matchmaking/main/round/id').val() && root.child('matchmaking/main/round/roster').child(auth.uid).val() === true))",
+            ".validate": "newData.hasChildren(['hits','downUntil','round','lastUid'])",
+            "hits": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 6 && newData.val() % 1 === 0"
+            },
+            "downUntil": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 9999999999999"
+            },
+            "round": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 99999999 && newData.val() % 1 === 0"
+            },
+            "lastUid": {
+              ".validate": "newData.isString()"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        }
+      }
+    },
+    "matchmaking": {
+      "main": {
+        ".read": "auth != null",
+        "players": {
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid",
+            ".validate": "newData.hasChildren(['name','weapon','t','joinedAt','queuedAt','queued'])",
+            "name": {
+              ".validate": "newData.isString() && newData.val().length <= 18"
+            },
+            "weapon": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 46 && newData.val() % 1 === 0"
+            },
+            "t": {
+              ".validate": "newData.isNumber() && newData.val() >= now - 10000 && newData.val() <= now + 3000"
+            },
+            "joinedAt": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 9999999999999"
+            },
+            "queuedAt": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 9999999999999"
+            },
+            "queued": {
+              ".validate": "newData.isBoolean()"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        "round": {
+          ".write": "(auth != null && newData.exists() && root.child('matchmaking/main/players').child(auth.uid).child('queued').val() === true && root.child('matchmaking/main/players').child(auth.uid).child('t').val() >= now - 15000) && !(data.child('phase').val() === 'playing' && data.child('endsAt').val() > now)",
+          ".validate": "(newData.hasChildren(['id','phase','startsAt','endsAt']) && ((newData.child('phase').val() === 'countdown' && (!data.exists() || data.child('phase').val() === 'waiting' || data.child('endsAt').val() <= now) && newData.child('startsAt').val() >= now + 9000 && newData.child('startsAt').val() <= now + 15000 && newData.child('endsAt').val() === newData.child('startsAt').val() + 900000 && newData.child('seedA').val() !== newData.child('seedB').val() && newData.child('roster').child(newData.child('seedA').val()).val() === true && newData.child('roster').child(newData.child('seedB').val()).val() === true) || (newData.child('phase').val() === 'playing' && data.child('phase').val() === 'countdown' && data.child('startsAt').val() <= now && newData.child('id').val() === data.child('id').val() && newData.child('startsAt').val() === data.child('startsAt').val() && newData.child('endsAt').val() === data.child('endsAt').val() && newData.child('endsAt').val() > now && newData.child('seedA').val() !== newData.child('seedB').val() && newData.child('roster').child(newData.child('seedA').val()).val() === true && newData.child('roster').child(newData.child('seedB').val()).val() === true) || (newData.child('phase').val() === 'waiting' && data.child('phase').val() === 'countdown' && newData.child('id').val() === data.child('id').val() && newData.child('startsAt').val() === 0 && newData.child('endsAt').val() === 0 && !newData.child('roster').exists()))) || (data.child('phase').val() === 'playing' && data.child('endsAt').val() > now && newData.child('id').val() === data.child('id').val() && newData.child('phase').val() === data.child('phase').val() && newData.child('startsAt').val() === data.child('startsAt').val() && newData.child('endsAt').val() === data.child('endsAt').val() && newData.child('seedA').val() === data.child('seedA').val() && newData.child('seedB').val() === data.child('seedB').val())",
+          "id": {
+            ".validate": "newData.isString() && newData.val().length <= 70"
+          },
+          "phase": {
+            ".validate": "newData.val() === 'waiting' || newData.val() === 'countdown' || newData.val() === 'playing'"
+          },
+          "seedA": {
+            ".validate": "newData.isString()"
+          },
+          "seedB": {
+            ".validate": "newData.isString()"
+          },
+          "startsAt": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 9999999999999"
+          },
+          "endsAt": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 9999999999999"
+          },
+          "roster": {
+            "$player": {
+              ".validate": "newData.val() === true && root.child('matchmaking/main/players').child($player).child('queued').val() === true && root.child('matchmaking/main/players').child($player).child('t').val() >= now - 15000",
+              ".write": "auth != null && auth.uid === $player && !data.exists() && newData.val() === true && root.child('matchmaking/main/round/phase').val() === 'playing' && root.child('matchmaking/main/round/endsAt').val() > now && root.child('matchmaking/main/players').child(auth.uid).child('queued').val() === true && root.child('matchmaking/main/players').child(auth.uid).child('t').val() >= now - 15000"
+            }
+          },
+          "$other": {
+            ".validate": false
+          }
+        }
+      }
+    },
+    "connectionClock": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid",
+        ".validate": "newData.isNumber() && newData.val() === now"
+      }
+    }
+  }
+}
